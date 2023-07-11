@@ -1,15 +1,12 @@
+import { PropTypes } from 'prop-types';
 import { useState, useEffect } from "react";
 import { Celda } from "./Celda"
 
-export const Sudoku = ({ flag }) => {
-    const initialState = {
-        selectedCell: "",
-        puzzle: [],
-        solution: [],
-        difficulty: ""
-    }
-
-    const [state, setState] = useState(initialState);
+export const Sudoku = ({ flag, handleError }) => {
+    const [puzzle, setPuzzle] = useState([]);
+    const [solution, setSolution] = useState([]);
+    const [difficulty, setDifficulty] = useState("");
+    const [selectedCell, setSelectedCell] = useState([-1, -1]);
     const [loading, setLoading] = useState(false);
 
     const getPuzzle = async () => {
@@ -23,17 +20,9 @@ export const Sudoku = ({ flag }) => {
         getPuzzle()
             .then(items => {
                 const sudoku = items.newboard.grids[0];
-                console.log(sudoku)
-                setState(prevState => {
-                    return {
-                        ...prevState,
-                        puzzle: sudoku.value,
-                        solution: sudoku.solution,
-                        difficulty: sudoku.difficulty
-                    }
-                })
+                setPuzzle(sudoku.value)
             })
-            .catch()
+            .catch(err => handleError(err))
             .finally(() => setLoading(false))
 
         return () => {
@@ -42,12 +31,7 @@ export const Sudoku = ({ flag }) => {
     }, [flag])
 
     const onSelect = (_, cell) => {
-        setState(prevState => {
-            return {
-                ...prevState,
-                selectedCell: cell,
-            }
-        })
+        setSelectedCell([cell[0], cell[1]]);
     }
 
     const borderStyle = (row, col) => {
@@ -65,21 +49,21 @@ export const Sudoku = ({ flag }) => {
 
     return (
         <>
-            <p>
-                {
-                    loading && "Getting puzzle..."
-                }
-            </p>
+            {
+                loading && <p>"Getting puzzle..."</p>
+            }
             <div className="sudoku">
                 {
-                    [1, 2, 3, 4, 5, 6, 7, 8, 9].map((row, irow) => {
-                        return [1, 2, 3, 4, 5, 6, 7, 8, 9].map((col, icol) => {
+                    [0, 1, 2, 3, 4, 5, 6, 7, 8].map(row => {
+                        return [0, 1, 2, 3, 4, 5, 6, 7, 8].map(col => {
                             return <Celda key={`${row}${col}`}
                                 id={`${row}${col}`}
-                                borderStyle={borderStyle(irow, icol)}
-                                isSelected={`${row}${col}` === state.selectedCell}
+                                borderStyle={borderStyle(row, col)}
+                                isSelected={selectedCell[0] == row && selectedCell[1] == col}
                                 onSelect={onSelect}
-                                currentNumber={(state.puzzle === undefined || state.puzzle == 0) ? 0 : state.puzzle[irow][icol]}
+                                currentNumber={(puzzle === undefined || puzzle == 0) ? 0 : puzzle[row][col]}
+                                isBlocked={(puzzle === undefined || puzzle == 0) ? false : 
+                                    (puzzle[row][col] == 0 ? false : true)}
                             />
                         })
                     })
@@ -87,4 +71,9 @@ export const Sudoku = ({ flag }) => {
             </div>
         </>
     )
+}
+
+Sudoku.propTypes = {
+    flag: PropTypes.number,
+    handleError: PropTypes.func,
 }
