@@ -1,26 +1,22 @@
 import { Sudoku } from "./components/Sudoku";
+import { Header } from "./components/Header";
+import { SideBar } from "./components/SideBar";
+import { NumbersBar } from "./components/NumbersBar";
 import { useState } from 'react';
 
 function App() {
-    const [flag, setFlag] = useState(0);
     const [error, setError] = useState("");
 
     const handleError = err => setError(err);
 
-    const handleUpdate = () => {
-        setFlag(prev => {
-            return prev == 0 ? 1 : 0;
-        })
-    }
-
     return (
         <div className="app">
-            <h2>Mi sudoku</h2>
-            {
-                error && <p className="error">{error}</p>
-            }
-            <button onClick={handleUpdate}>Update</button>
-            <Sudoku flag={flag} handleError={handleError}/>
+            <Header error={error}/>
+            <div className="sudoku-space">
+                <Sudoku handleError={handleError}/>
+                <SideBar />
+            </div>
+            <NumbersBar />
         </div>
     );
 }

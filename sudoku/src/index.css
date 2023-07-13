@@ -2,81 +2,112 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'JetBrains Mono', Courier, monospace;
+}
+
+body {
+    background: #fdfdfd;
 }
 
 .app {
-    display: flex;
-    flex-flow: column;
+    margin: auto;
+    width: 80%;
+    height: 100vh;
+}
+
+.sidebar {
+    display: grid;
+    flex-direction: column;
+    height: 100%;
+    grid-template-rows: repeat(3, 60px) auto;
+    /* grid-template-columns: 1fr; */
+    justify-content: center;
     align-items: center;
+}
+
+.new {
+    margin-top: auto;
+}
+
+.sidebar > button {
+    border: 2px solid #101010;
+    color: #101010;
+    background: #fdfdfd;
+    font-size: 1.2em;
+    height: 50px;
+    min-width: 130px;
+    border-radius: 10px;
+}
+
+.numbersbar {
+}
+
+.header {
+}
+
+.sudoku-space {
+    display: grid;
+    margin: auto;
+    grid-template-columns: auto minmax(130px, 230px);
+    column-gap: 10px;
+    justify-content: center;
 }
 
 .sudoku {
     display: grid;
-    grid-template-rows: repeat(9, auto);
-    grid-template-columns: repeat(9, auto);
-    margin: 20px;
-    border: 4px solid black
+    grid-template-rows: repeat(9, minmax(0px, 65px));
+    grid-template-columns: repeat(9, minmax(0px, 65px));
+    border: 2px solid black;
+    aspect-ratio: 1;
 }
 
 .celda {
-    height: 65px;
-    width: 65px;
-    border: 1px solid black;
+    border: 0.5px solid black;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2em;
+    font-size: 1.4em;
 }
 
 .tborder {
-    border-top: 4px solid black;
+    border-top: 2px solid black;
 }
 
 .lborder {
-    border-left: 4px solid black;
+    border-left: 2px solid black;
 }
 
 .selected {
-    background: lightblue;
+    background: #FCF9D9;
 }
 
 .blocked {
-    background: lightgray;
+    background: #F5ED7A;
 }
 
-@media (max-width: 700px) {
-    .region {
-        height: 150px;
-        width: 150px;
+@media (max-width: 650px) {
+    .app {
+        grid-template-areas: 
+            "hd"
+            "sb"
+            "sk"
+            "nb";
+        justify-content: flex-start;
+        grid-template-rows: 0.5fr 1fr 4fr 1fr;
     }
 
-    .celda {
-        height: 50px;
-        width: 50px;
-    }
-}
-
-@media (max-width: 500px) {
-    .region {
-        height: 126px;
-        width: 126px;
+    .sudoku-space {
+        justify-content: flex-start;
     }
 
-    .celda {
-        height: 42px;
-        width: 42px;
-    }
-}
-
-@media (max-width: 400px) {
-    .region {
-        height: 111px;
-        width: 111px;
+    .sidebar {
+        column-gap: 10px;
+        grid-template-columns: repeat(2, minmax(0, 230px));
+        justify-content: flex-start;
     }
 
-    .celda {
-        height: 37px;
-        width: 37px;
+    .new {
+        grid-row-start: 1;
+        margin: 0;
     }
 }

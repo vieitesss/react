@@ -2,7 +2,7 @@ import { PropTypes } from 'prop-types';
 import { useState, useEffect } from "react";
 import { Celda } from "./Celda"
 
-export const Sudoku = ({ flag, handleError }) => {
+export const Sudoku = ({ handleError }) => {
     const [puzzle, setPuzzle] = useState([]);
     const [currentBoard, setCurrentBoard] = useState([]);
     const [solution, setSolution] = useState([]);
@@ -24,37 +24,34 @@ export const Sudoku = ({ flag, handleError }) => {
         ]
     }
 
-    useEffect(() => {
-        console.log("reset puzzle");
-        const newPuzzle = staticPuzzle();
-        setPuzzle(newPuzzle.slice());
-        setCurrentBoard(newPuzzle.slice());
-    }, [flag])
-
-    useEffect(() => {
-        console.log(puzzle === currentBoard)
-    }, [puzzle])
-
-    // const getPuzzle = async () => {
-    //     return fetch("https://sudoku-api.vercel.app/api/dosuku?query={newboard(limit:1){grids{value,solution,difficulty},results,message}}")
-    //         .then(data => data.json());
-    // }
-
     // useEffect(() => {
-    //     const controller = new AbortController()
-    //     setLoading(true)
-    //     getPuzzle()
-    //         .then(items => {
-    //             const sudoku = items.newboard.grids[0];
-    //             setPuzzle(sudoku.value)
-    //         })
-    //         .catch(err => handleError(err))
-    //         .finally(() => setLoading(false))
-
-    //     return () => {
-    //         controller.abort()
-    //     }
+    //     console.log("reset puzzle");
+    //     const newPuzzle = staticPuzzle();
+    //     setPuzzle(newPuzzle.slice());
+    //     setCurrentBoard(newPuzzle.slice());
     // }, [flag])
+
+    const getPuzzle = async () => {
+        return fetch("https://sudoku-api.vercel.app/api/dosuku?query={newboard(limit:1){grids{value,solution,difficulty},results,message}}")
+            .then(data => data.json());
+    }
+
+    useEffect(() => {
+        const controller = new AbortController()
+        setLoading(true)
+        getPuzzle()
+            .then(items => {
+                const sudoku = items.newboard.grids[0];
+                setPuzzle(sudoku.value.slice())
+                setCurrentBoard(sudoku.value.slice())
+            })
+            .catch(err => handleError(err))
+            .finally(() => setLoading(false))
+
+        return () => {
+            controller.abort()
+        }
+    }, [])
 
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
@@ -106,7 +103,7 @@ export const Sudoku = ({ flag, handleError }) => {
     }
 
     return (
-        <>
+        <div>
             {
                 loading && <p>Getting puzzle...</p>
             }
@@ -127,7 +124,7 @@ export const Sudoku = ({ flag, handleError }) => {
                     })
                 }
             </div>
-        </>
+        </div>
     )
 }
 
