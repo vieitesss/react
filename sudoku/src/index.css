@@ -6,7 +6,17 @@
 }
 
 body {
-    background: #fdfdfd;
+    background: #22262F;
+}
+
+button {
+    cursor: pointer;
+    transition: transform 300ms;
+}
+
+button:hover {
+    background: #565F76;
+    transform: translateY(-5px);
 }
 
 .app {
@@ -20,7 +30,6 @@ body {
     flex-direction: column;
     height: 100%;
     grid-template-rows: repeat(3, 60px) auto;
-    /* grid-template-columns: 1fr; */
     justify-content: center;
     align-items: center;
 }
@@ -30,19 +39,58 @@ body {
 }
 
 .sidebar > button {
-    border: 2px solid #101010;
-    color: #101010;
-    background: #fdfdfd;
+    color: white;
+    border: 1px solid white;
+    background: #22262F;
     font-size: 1.2em;
     height: 50px;
     min-width: 130px;
-    border-radius: 10px;
+    border-radius: 30px;
 }
 
 .numbersbar {
+    display: grid;
+    justify-content: center;
+    grid-template-rows: repeat(2, auto);
+    grid-template-columns: repeat(9, auto);
+    column-gap: 20px;
+    row-gap: 20px;
+    margin-top: 20px;
+}
+
+.number {
+    color: white;
+    display: block;
+    font-size: 2.7em;
+    width: 60px;
+    height: 60px;
+    border: 1px solid white;
+    background: #22262F;
+    border-radius: 50%;
+}
+
+.notes {
+    display: block;
+    width: 60px;
+    height: 60px;
+    grid-column-start: 1;
+    grid-column-end: 10;
+    color: white;
+    border: 1px solid white;
+    background: #22262F;
+    border-radius: 50%;
+}
+
+.notes p {
+    transform: translateY(20px)
+}
+
+.icon {
+    font-size: 1.5em;
 }
 
 .header {
+    color: white;
 }
 
 .sudoku-space {
@@ -57,32 +105,54 @@ body {
     display: grid;
     grid-template-rows: repeat(9, minmax(0px, 65px));
     grid-template-columns: repeat(9, minmax(0px, 65px));
-    border: 2px solid black;
+    border: 3px solid #426CE7;
+    background: #EDF1FD;
     aspect-ratio: 1;
 }
 
-.celda {
-    border: 0.5px solid black;
+.cell {
+    border: 0.5px solid #426CE7;
+}
+
+.notEmptyCell {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.4em;
+    font-size: 1.5em;
+}
+
+.emptyCell {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(13px, auto));
+    grid-template-rows: repeat(3, minmax(13px, auto));
+    font-size: 0.8em;
+}
+
+.numberNote {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.guess {
+    /* color: #1FADFF; */
+    color: #426CE7;
 }
 
 .tborder {
-    border-top: 2px solid black;
+    border-top: 3px solid #426CE7;
 }
 
 .lborder {
-    border-left: 2px solid black;
+    border-left: 3px solid #426CE7;
 }
 
 .selected {
-    background: #FCF9D9;
+    background: #ADE2FF;
 }
 
 .blocked {
-    background: #F5ED7A;
+    /* background: #FFD829; */
 }
 
 @media (max-width: 650px) {

@@ -2,13 +2,14 @@ import { PropTypes } from 'prop-types';
 import { useState, useEffect } from "react";
 import { Celda } from "./Celda"
 
-export const Sudoku = ({ handleError }) => {
+export const Sudoku = ({ handleError, togNewPuzzle, togReset, togSolution, togCheck, newNumber, isNotesActive, togNumberClicked }) => {
     const [puzzle, setPuzzle] = useState([]);
     const [currentBoard, setCurrentBoard] = useState([]);
     const [solution, setSolution] = useState([]);
     const [difficulty, setDifficulty] = useState("");
     const [selectedCell, setSelectedCell] = useState([-1, -1]);
     const [loading, setLoading] = useState(false);
+    const [notes, setNotes] = useState({});
     
     const staticPuzzle = () => {
         return [
@@ -25,25 +26,25 @@ export const Sudoku = ({ handleError }) => {
     }
 
     // useEffect(() => {
-    //     console.log("reset puzzle");
     //     const newPuzzle = staticPuzzle();
     //     setPuzzle(newPuzzle.slice());
-    //     setCurrentBoard(newPuzzle.slice());
-    // }, [flag])
+    // }, [togNewPuzzle])
 
-    const getPuzzle = async () => {
-        return fetch("https://sudoku-api.vercel.app/api/dosuku?query={newboard(limit:1){grids{value,solution,difficulty},results,message}}")
-            .then(data => data.json());
-    }
+    // useEffect(() => {
+    //     setCurrentBoard(puzzle.slice());
+    // }, [puzzle])
 
     useEffect(() => {
-        const controller = new AbortController()
-        setLoading(true)
-        getPuzzle()
+        const controller = new AbortController();
+        const signal = controller.signal;
+        setLoading(true);
+        fetch("https://sudoku-api.vercel.app/api/dosuku?query={newboard(limit:1){grids{value,solution,difficulty},results,message}}", { signal })
+            .then(data => data.json())
             .then(items => {
                 const sudoku = items.newboard.grids[0];
                 setPuzzle(sudoku.value.slice())
                 setCurrentBoard(sudoku.value.slice())
+                setSolution(sudoku.solution.slice())
             })
             .catch(err => handleError(err))
             .finally(() => setLoading(false))
@@ -51,7 +52,7 @@ export const Sudoku = ({ handleError }) => {
         return () => {
             controller.abort()
         }
-    }, [])
+    }, [togNewPuzzle])
 
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
@@ -61,10 +62,55 @@ export const Sudoku = ({ handleError }) => {
         }
     }, [selectedCell])
 
+    useEffect(() => {
+        setCurrentBoard(puzzle.slice());
+    }, [togReset])
+
+    useEffect(() => {
+        setCurrentBoard(solution.slice())
+    }, [togSolution])
+
+    // TODO: check flag
+    useEffect(() => {}, [togCheck])
+
+    useEffect(() => {
+        if (isNotesActive) {
+            updateNotes();
+        } else {
+            updateCurrentBoard(newNumber);
+        }
+        // console.log(newNumber)
+    }, [newNumber, togNumberClicked])
+
+    const updateNotes = () => {
+        if (selectedCell[0] == -1 || selectedCell[1] == -1) {
+            return;
+        }
+
+        const newNotes = {...notes}
+        const cell = selectedCellToString()
+        console.log(cell)
+
+        if (newNotes[cell] == undefined) {
+            newNotes[cell] = [newNumber]
+        } else if (!newNotes[cell].includes(newNumber)) {
+            newNotes[cell] = [...newNotes[cell], newNumber]
+        } else {
+            newNotes[cell] = newNotes[cell].filter((item) => {
+                return item != newNumber;
+            })
+        }
+
+        setNotes(newNotes)
+    }
+
     const handleKeyDown = e => {
         const n = Number(e.key)
+        updateCurrentBoard(n);
+    }
 
-        if (!Number.isNaN(n) && isNotBlocked()) {
+    const updateCurrentBoard = (n) => {
+        if (somethingSelected() && isNotBlocked() && !Number.isNaN(n)) {
             setCurrentBoard(prev => {
                 const newBoard =  prev.map((array, row) => {
                     return array.map((value, col) => {
@@ -79,6 +125,10 @@ export const Sudoku = ({ handleError }) => {
                 return newBoard;
             })
         }
+    }
+
+    const somethingSelected = () => {
+        return selectedCell[0] != -1 && selectedCell[1] != -1;
     }
 
     const isNotBlocked = () => {
@@ -102,6 +152,10 @@ export const Sudoku = ({ handleError }) => {
         return border;
     }
 
+    const selectedCellToString = () => {
+        return selectedCell[0].toString() + selectedCell[1].toString()
+    }
+
     return (
         <div>
             {
@@ -119,6 +173,7 @@ export const Sudoku = ({ handleError }) => {
                                 currentNumber={(currentBoard === undefined || currentBoard == 0) ? 0 : currentBoard[row][col]}
                                 isBlocked={(puzzle === undefined || puzzle == 0) ? false : 
                                     (puzzle[row][col] == 0 ? false : true)}
+                                cellNotes={(notes[row.toString() + col.toString()] == undefined ? [] : notes[row.toString() + col.toString()])}
                             />
                         })
                     })
@@ -129,6 +184,12 @@ export const Sudoku = ({ handleError }) => {
 }
 
 Sudoku.propTypes = {
-    flag: PropTypes.number,
     handleError: PropTypes.func,
+    togNewPuzzle: PropTypes.bool,
+    togReset: PropTypes.bool,
+    togSolution: PropTypes.bool,
+    togCheck: PropTypes.bool,
+    newNumber: PropTypes.number,
+    isNotesActive: PropTypes.bool,
+    togNumberClicked: PropTypes.bool,
 }
